@@ -1,4 +1,4 @@
-# @title \en Build Texture Atlas\enden
+# @title \en Texture atlas builder\enden
 
 import sys
 
