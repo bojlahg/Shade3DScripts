@@ -1,9 +1,11 @@
 # Shade3DScripts
 Shade3D utility scripts <br>
-	TextureAtlasBuilder.py - Texture atlas builder script <br>
-	SmartUVMapActiveFaces.py - 1:1 UV mapping script <br>
-	SnapActiveUVVertexes.py	- UV pixel snap script <br>
-	SnapActiveVertexes.py - Vertex snap script <br>
+<ul>
+	<li>TextureAtlasBuilder.py - Texture atlas builder script</li>
+	<li>SmartUVMapActiveFaces.py - 1:1 UV mapping script</li>
+	<li>SnapActiveUVVertexes.py	- UV pixel snap script</li>
+	<li>SnapActiveVertexes.py - Vertex snap script</li>
+</ul>
 	
 Just put scripts in "/Shade3D/scripts/" folder (for example "c:\Program Files\Shade3D\Shade 3D ver.15E\bin\scripts\")<br>
 
