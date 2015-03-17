@@ -611,10 +611,10 @@ if dlg.ask('Build texture atlas'):
                             break
 
                 if tad != None:
-                    tx = float(tad.rect_dst.x) / float(bao.atlas_width)
-                    ty = float(tad.rect_dst.y) / float(bao.atlas_height)
-                    tw = float(tad.rect_dst.width) / float(bao.atlas_width)
-                    th = float(tad.rect_dst.height) / float(bao.atlas_width)
+                    tx = float(tad.rect_dst.x + bao.padding) / float(bao.atlas_width)
+                    ty = float(tad.rect_dst.y + bao.padding) / float(bao.atlas_height)
+                    tw = float(tad.rect_dst.width - 2 * bao.padding) / float(bao.atlas_width)
+                    th = float(tad.rect_dst.height - 2 * bao.padding) / float(bao.atlas_width)
 
                     # check if rect is rotated
                     if tad.rect_src.width != tad.rect_dst.width:
@@ -639,7 +639,7 @@ if dlg.ask('Build texture atlas'):
                 atlas_master_image_normal.image.create_window('Build texture atlas: Normal')
 
         #xshade.show_message_box('Success\nAtlas filled %f %%' % (packer.occupancy() * 100), False)
-            print 'Success\nAtlas filled %f %%' % (packer.occupancy() * 100)
+		print 'Success\nAtlas filled %f %%' % (packer.occupancy() * 100)
     else:
         #xshade.show_message_box('Failed\nNot enough space to fit all textures into atlas', False)
         print 'Not enough space to fit all textures into atlas!'
