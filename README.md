@@ -1,10 +1,12 @@
 # Shade3DScripts
 <b>Shade3D utility scripts</b><br>
 <ul>
-	<li><b>TextureAtlasBuilder.py</b> - Texture atlas builder script</li>
-	<li><b>SmartUVMapActiveFaces.py</b> - 1:1 UV mapping script</li>
-	<li><b>SnapActiveUVVertexes.py</b>	- UV pixel snap script</li>
-	<li><b>SnapActiveVertexes.py</b> - Vertex snap script</li>
+	<li><b>TextureAtlasBuilder.py</b> - Places all diffuse and normal texture images (for all polygon meshes) in one bigger image creating copy of scene with reparametrized UVs.</li>
+	<li><b>SmartUVMapActiveFaces.py</b> - UV maps active faces 1:1 aligning them with global axes.</li>
+	<li><b>SnapActiveUVVertexes.py</b>	- Snaps active UV map vertexes to pixels (if selection has assigned diffuse texture).</li>
+	<li><b>SnapActiveVertexes.py</b> - Snaps active vertexes</li>
+	<li><b>LoadImageToSurface.py</b> - Loads image and creates master surface placing image as diffuse. Sets names of master surface as filename.</li>
+	<li><b>RenderActiveFacesUV.py</b> - Renders reference UV image for active faces using per pixel meter precision. (Alternative to "Save UVs Into image" context menu option of UV view)</li>
 </ul>
 	
 Just put scripts in "/Shade3D/bin/scripts/" folder (for example "c:\Program Files\Shade3D\Shade 3D ver.15E\bin\scripts\")<br>
