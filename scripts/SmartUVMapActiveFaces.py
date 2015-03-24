@@ -74,7 +74,7 @@ if dlg.ask('Smart UV map active faces'):
 			v2 = verts2[i]
 			vec2 = vec_sub(v2, v0)
 			vang = vec_angle(vec1, vec2)
-			if vang > -1 and vang < 1:
+			if vang > -0.99 and vang < 0.99:
 				break
 		
 		av = vec_unit(vec1)
@@ -88,7 +88,7 @@ if dlg.ask('Smart UV map active faces'):
 			pv = vec_proj(texvec, av)
 			pvs = vec_angle(pv, av)
 			uv.append((pus * vec_mag(pu) / 1000 * scale, pvs * vec_mag(pv) / 1000 * scale))
-			
+		
 		minu = uv[0][0]
 		minv = uv[0][1]
 		for i in range(1, vcnt):
