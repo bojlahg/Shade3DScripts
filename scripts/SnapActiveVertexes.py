@@ -20,6 +20,8 @@ dlg.set_value(snapz_idx, True)
 stepz_idx = dlg.append_int('Z step')
 dlg.set_value(stepz_idx, 100)
 
+preset_idx = dlg.append_radio_button('presets/custom/250/500/1000')
+
 if dlg.ask('Snap active vertexes'):
 	snapx = dlg.get_value(snapx_idx)
 	stepx = dlg.get_value(stepx_idx)
@@ -29,6 +31,18 @@ if dlg.ask('Snap active vertexes'):
 	
 	snapz = dlg.get_value(snapz_idx)
 	stepz = dlg.get_value(stepz_idx)
+	
+	preset = dlg.get_value(preset_idx)
+	
+	if preset == 1:
+		snapy = True
+		stepy = 250
+	elif preset == 2:
+		snapz = True
+		stepz = 500
+	elif preset == 3:
+		snapz = True
+		stepz = 1000
 
 	active_shape = xshade.scene().active_shape()
 	for vtxidx in active_shape.active_vertex_indices:
