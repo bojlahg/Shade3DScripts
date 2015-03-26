@@ -36,8 +36,12 @@ dlg = xshade.create_dialog()
 scale_idx = dlg.append_float('Scale')
 dlg.set_value(scale_idx, 1)
 
+fituv_idx = dlg.append_bool('Fit UV')
+dlg.set_value(fituv_idx, False)
+
 if dlg.ask('Smart UV map active faces'):
 	scale = dlg.get_value(scale_idx)
+	fituv = dlg.get_value(fituv_idx)
 
 	active_shape = xshade.scene().active_shape()
 	for faceind in active_shape.active_face_indices:
@@ -96,8 +100,44 @@ if dlg.ask('Smart UV map active faces'):
 			minv = min(minv, uv[i][1])
 			
 		for i in range(0, vcnt):
-			uv[i] = ( uv[i][0] - minu, uv[i][1] - minv)
-				
+			uv[i] = (uv[i][0] - minu, uv[i][1] - minv)
+			
 		for i in range(0, vcnt):
 			curface.set_face_uv(0, (i + mpidx) % vcnt, uv[i])
+
+	# fit all UV to 0-1
+	if fituv == True:
+		first_sample = True
+		minu = 0
+		minv = 0
+		maxu = 0
+		maxv = 0
+		for faceind in active_shape.active_face_indices:
+			curface = active_shape.face(faceind)
+			vcnt = curface.number_of_vertices
+			for i in range(0, vcnt):
+				vtxuv = curface.get_face_uv(0, i)
+				print vtxuv
+				if first_sample == True:
+					first_sample = False
+					minu = vtxuv[0]
+					minv = vtxuv[1]
+					maxu = vtxuv[0]
+					maxv = vtxuv[1]
+				else:
+					minu = min(minu, vtxuv[0])
+					minv = min(minv, vtxuv[1])
+					maxu = max(maxu, vtxuv[0])
+					maxv = max(maxv, vtxuv[1])
 		
+		lenu = maxu - minu
+		lenv = maxv - minv
+		
+		print maxu, minu, maxv, minv
+		
+		for faceind in active_shape.active_face_indices:
+			curface = active_shape.face(faceind)
+			vcnt = curface.number_of_vertices
+			for i in range(0, vcnt):
+				vtxuv = curface.get_face_uv(0, i)
+				curface.set_face_uv(0, i, (vtxuv[0] / lenu, vtxuv[1] / lenv))
