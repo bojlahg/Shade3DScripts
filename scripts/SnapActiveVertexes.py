@@ -35,13 +35,16 @@ if dlg.ask('Snap active vertexes'):
 	preset = dlg.get_value(preset_idx)
 	
 	if preset == 1:
-		snapy = True
+		stepx = 250
 		stepy = 250
+		stepz = 250
 	elif preset == 2:
-		snapz = True
+		stepx = 500
+		stepy = 500
 		stepz = 500
 	elif preset == 3:
-		snapz = True
+		stepx = 1000
+		stepy = 1000
 		stepz = 1000
 
 	active_shape = xshade.scene().active_shape()
