@@ -33,6 +33,9 @@ def vec_angle(va, vb):
 # show settings dialog
 dlg = xshade.create_dialog()
 
+uvset_idx = dlg.append_selection('UV/UV1/UV2/UV2/UV3/UV4/UV5/UV6/UV7/UV8')
+dlg.set_value(uvset_idx, 0)
+
 scale_idx = dlg.append_float('Scale')
 dlg.set_value(scale_idx, 1)
 
@@ -40,6 +43,7 @@ fituv_idx = dlg.append_bool('Fit UV')
 dlg.set_value(fituv_idx, False)
 
 if dlg.ask('Smart UV map active faces'):
+	uvset = dlg.get_value(uvset_idx)
 	scale = dlg.get_value(scale_idx)
 	fituv = dlg.get_value(fituv_idx)
 
@@ -103,7 +107,7 @@ if dlg.ask('Smart UV map active faces'):
 				uv[i] = (uv[i][0] - minu, uv[i][1] - minv)
 				
 			for i in range(0, vcnt):
-				curface.set_face_uv(0, (i + mpidx) % vcnt, uv[i])
+				curface.set_face_uv(uvset, (i + mpidx) % vcnt, uv[i])
 
 		# fit all UV to 0-1
 		if fituv == True:
@@ -116,7 +120,7 @@ if dlg.ask('Smart UV map active faces'):
 				curface = active_shape.face(faceind)
 				vcnt = curface.number_of_vertices
 				for i in range(0, vcnt):
-					vtxuv = curface.get_face_uv(0, i)
+					vtxuv = curface.get_face_uv(uvset, i)
 					if first_sample == True:
 						first_sample = False
 						minu = vtxuv[0]
@@ -137,4 +141,4 @@ if dlg.ask('Smart UV map active faces'):
 				vcnt = curface.number_of_vertices
 				for i in range(0, vcnt):
 					vtxuv = curface.get_face_uv(0, i)
-					curface.set_face_uv(0, i, (vtxuv[0] / lenu, vtxuv[1] / lenv))
+					curface.set_face_uv(uvset, i, (vtxuv[0] / lenu, vtxuv[1] / lenv))

@@ -33,10 +33,14 @@ def vec_angle(va, vb):
 # show settings dialog
 dlg = xshade.create_dialog()
 
+uvset_idx = dlg.append_selection('UV/UV1/UV2/UV2/UV3/UV4/UV5/UV6/UV7/UV8')
+dlg.set_value(uvset_idx, 0)
+
 ppm_idx = dlg.append_int('Scale', 'ppm')
 dlg.set_value(ppm_idx, 16)
 
 if dlg.ask('Smart UV map active faces density'):
+	uvset = dlg.get_value(uvset_idx)
 	ppm = dlg.get_value(ppm_idx)
 
 	for active_shape in xshade.scene().active_shapes:
@@ -155,4 +159,4 @@ if dlg.ask('Smart UV map active faces density'):
 						uv[i] = ( uv[i][0] - minu, uv[i][1] - minv)
 					# set uv back
 					for i in range(0, vcnt):
-						curface.set_face_uv(0, (i + mpidx) % vcnt, uv[i])
+						curface.set_face_uv(uvset, (i + mpidx) % vcnt, uv[i])
