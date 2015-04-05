@@ -362,9 +362,13 @@ class Packer:
 			i += 1
 
 class AtlasData:
-	def __init__(self, img_diffuse, img_normal, bao, mesh):
+	def __init__(self, img_diffuse, img_normal, img_spec1, img_bump, img_glow, img_disp, bao, mesh):
 		self.image_diffuse = img_diffuse
 		self.image_normal = img_normal
+		self.image_spec1 = img_spec1
+		self.image_bump = img_bump
+		self.image_glow = img_glow
+		self.image_disp = img_disp
 		self.meshes = []
 		self.meshes.append(mesh)
 		self.rect_src = Rect(-1, 0, 0, img_diffuse.size[0] + bao.padding * 2, img_diffuse.size[1] + bao.padding * 2)
@@ -399,6 +403,10 @@ def get_textures_recursive(shp, tl, bao):
 def add_texture(tl, surf, bao, shp):
 	img_diffuse = None
 	img_normal = None
+	img_spec1 = None
+	img_bump = None
+	img_glow = None
+	img_disp = None
 	for i in range(0, surf.number_of_mapping_layers):
 		maplayer = surf.mapping_layer(i)
 		if maplayer.pattern == 14: # Image
@@ -406,19 +414,35 @@ def add_texture(tl, surf, bao, shp):
 				img_diffuse = maplayer.image
 			elif maplayer.type == 21: # Normal
 				img_normal = maplayer.image
+			elif maplayer.type == 1: # Specular 1
+				img_spec1 = maplayer.image
+			elif maplayer.type == 5: # Bump
+				img_bump = maplayer.image
+			elif maplayer.type == 8: # Glow
+				img_glow = maplayer.image
+			elif maplayer.type == 22: # Displacement
+				img_disp = maplayer.image
 	for i in range(0, len(tl)):
 		tad = tl[i]
 		if tad.image_diffuse.path == img_diffuse.path:
 			tad.meshes.append(shp)
 			return
 	if img_diffuse != None:
-		tad = AtlasData(img_diffuse, img_normal, bao, shp)
+		tad = AtlasData(img_diffuse, img_normal, img_spec1, img_bump, img_glow, img_disp, bao, shp)
 		tl.append(tad)
 
-def copy_texture_to_atlas(mi_diffuse, mi_normal, tad, bao):
+def copy_texture_to_atlas(mi_diffuse, mi_normal, mi_spec1, mi_bump, mi_glow, mi_disp, tad, bao):
 	atlasimgdiffuse = mi_diffuse.image
 	if bao.include_normalmap == True:
 		atlasimgnormal = mi_normal.image
+	if bao.include_spec1map == True:
+		atlasimgspec1 = mi_spec1.image
+	if bao.include_bumpmap == True:
+		atlasimgbump = mi_bump.image
+	if bao.include_glowmap == True:
+		atlasimgglow = mi_glow.image
+	if bao.include_dispmap == True:
+		atlasimgdisp = mi_disp.image
 	w = tad.rect_dst.width
 	h = tad.rect_dst.height
 	# check if rect is rotated
@@ -431,6 +455,14 @@ def copy_texture_to_atlas(mi_diffuse, mi_normal, tad, bao):
 				atlasimgdiffuse.set_pixel_rgba(tad.rect_dst.x + x, tad.rect_dst.y + y, get_pixel_clamped_rgba(tad.image_diffuse, h - y - bao.padding - 1, x - bao.padding))
 				if bao.include_normalmap == True and tad.image_normal != None:
 					atlasimgnormal.set_pixel_rgba(tad.rect_dst.x + x, tad.rect_dst.y + y, get_pixel_clamped_rgba(tad.image_normal, h - y - bao.padding - 1, x - bao.padding))
+				if bao.include_spec1map == True and tad.image_spec1 != None:
+					atlasimgspec1.set_pixel_rgba(tad.rect_dst.x + x, tad.rect_dst.y + y, get_pixel_clamped_rgba(tad.image_spec1, h - y - bao.padding - 1, x - bao.padding))
+				if bao.include_bumpmap == True and tad.image_bump != None:
+					atlasimgbump.set_pixel_rgba(tad.rect_dst.x + x, tad.rect_dst.y + y, get_pixel_clamped_rgba(tad.image_bump, h - y - bao.padding - 1, x - bao.padding))
+				if bao.include_glowmap == True and tad.image_glow != None:
+					atlasimgglow.set_pixel_rgba(tad.rect_dst.x + x, tad.rect_dst.y + y, get_pixel_clamped_rgba(tad.image_glow, h - y - bao.padding - 1, x - bao.padding))
+				if bao.include_dispmap == True and tad.image_disp != None:
+					atlasimgdisp.set_pixel_rgba(tad.rect_dst.x + x, tad.rect_dst.y + y, get_pixel_clamped_rgba(tad.image_disp, h - y - bao.padding - 1, x - bao.padding))
 				x += 1
 			y += 1
 	else:
@@ -442,6 +474,14 @@ def copy_texture_to_atlas(mi_diffuse, mi_normal, tad, bao):
 				atlasimgdiffuse.set_pixel_rgba(tad.rect_dst.x + x, tad.rect_dst.y + y, get_pixel_clamped_rgba(tad.image_diffuse, x - bao.padding, y - bao.padding))
 				if bao.include_normalmap == True and tad.image_normal != None:
 				   atlasimgnormal.set_pixel_rgba(tad.rect_dst.x + x, tad.rect_dst.y + y, get_pixel_clamped_rgba(tad.image_normal, x - bao.padding, y - bao.padding))
+				if bao.include_spec1map == True and tad.image_spec1 != None:
+				   atlasimgspec1.set_pixel_rgba(tad.rect_dst.x + x, tad.rect_dst.y + y, get_pixel_clamped_rgba(tad.image_spec1, x - bao.padding, y - bao.padding))
+				if bao.include_bumpmap == True and tad.image_bump != None:
+				   atlasimgbump.set_pixel_rgba(tad.rect_dst.x + x, tad.rect_dst.y + y, get_pixel_clamped_rgba(tad.image_bump, x - bao.padding, y - bao.padding))
+				if bao.include_glowmap == True and tad.image_glow != None:
+				   atlasimgglow.set_pixel_rgba(tad.rect_dst.x + x, tad.rect_dst.y + y, get_pixel_clamped_rgba(tad.image_glow, x - bao.padding, y - bao.padding))
+				if bao.include_dispmap == True and tad.image_disp != None:
+				   atlasimgdisp.set_pixel_rgba(tad.rect_dst.x + x, tad.rect_dst.y + y, get_pixel_clamped_rgba(tad.image_disp, x - bao.padding, y - bao.padding))
 				x += 1
 			y += 1
 
@@ -458,11 +498,31 @@ def get_pixel_clamped_rgba(img, x, y):
 		ny = img.size[1] - 1
 	return img.get_pixel_rgba(nx, ny)
 
+def fill_diffusemap(img):
+	for y in range(0, img.size[1]):
+		for x in range(0, img.size[0]):
+			img.set_pixel_rgba(x, y, (0, 0, 0, 1))
+	
 def fill_normalmap(img):
 	for y in range(0, img.size[1]):
 		for x in range(0, img.size[0]):
 			img.set_pixel_rgba(x, y, (0.5, 0.5, 1, 1))
 
+def fill_specularmap(img):
+	for y in range(0, img.size[1]):
+		for x in range(0, img.size[0]):
+			img.set_pixel_rgba(x, y, (0.5, 0.5, 0.5, 1))
+			
+def fill_bumpmap(img):
+	for y in range(0, img.size[1]):
+		for x in range(0, img.size[0]):
+			img.set_pixel_rgba(x, y, (0.5, 0.5, 0.5, 1))
+
+def fill_glowmap(img):
+	for y in range(0, img.size[1]):
+		for x in range(0, img.size[0]):
+			img.set_pixel_rgba(x, y, (0, 0, 0, 1))
+			
 class BuildAtlasOptions:
 	def __init__(self):
 		self.pack_method = 2
@@ -470,6 +530,8 @@ class BuildAtlasOptions:
 		self.atlas_height = 512
 		self.padding = 2
 		self.include_normalmap = True
+		self.include_apecular1map = True
+		self.include_bumpmap = True
 		self.allow_rotation = True
 		self.show_result = False
 
@@ -488,8 +550,16 @@ padding_idx = dlg.append_int('Padding', 'px')
 dlg.set_value(padding_idx, 2)
 allow_rotation_idx = dlg.append_bool('Allow rotation')
 dlg.set_value(allow_rotation_idx, True)
-include_normalmap_idx = dlg.append_bool('Include normal map')
-dlg.set_value(include_normalmap_idx, True)
+include_normalmap_idx = dlg.append_bool('Include Normal map')
+dlg.set_value(include_normalmap_idx, False)
+include_spec1map_idx = dlg.append_bool('Include Specular1 map')
+dlg.set_value(include_spec1map_idx, False)
+include_bumpmap_idx = dlg.append_bool('Include Bump map')
+dlg.set_value(include_bumpmap_idx, False)
+include_glowmap_idx = dlg.append_bool('Include Glow map')
+dlg.set_value(include_glowmap_idx, False)
+include_dispmap_idx = dlg.append_bool('Include Displacement map (not tested)')
+dlg.set_value(include_dispmap_idx, False)
 show_result_idx = dlg.append_bool('Show result in separate window')
 dlg.set_value(show_result_idx, False)
 
@@ -502,6 +572,10 @@ if dlg.ask('Build texture atlas'):
 	bao.atlas_height = dlg.get_value(atlas_height_idx)
 	bao.padding = dlg.get_value(padding_idx)
 	bao.include_normalmap = dlg.get_value(include_normalmap_idx)
+	bao.include_spec1map = dlg.get_value(include_spec1map_idx)
+	bao.include_bumpmap = dlg.get_value(include_bumpmap_idx)
+	bao.include_glowmap = dlg.get_value(include_glowmap_idx)
+	bao.include_dispmap = dlg.get_value(include_dispmap_idx)
 	bao.allow_rotation = dlg.get_value(allow_rotation_idx)
 	bao.show_result = dlg.get_value(show_result_idx)
 	#
@@ -531,8 +605,10 @@ if dlg.ask('Build texture atlas'):
 		xshade.new_scene()
 		scene2 = xshade.scene()
 
+		# create layer images
 		atlas_master_image_diffuse = scene2.create_master_image('TextureAtlas.png')
 		atlas_master_image_diffuse.image = xshade.create_image((bao.atlas_width, bao.atlas_height), 32)
+		fill_diffusemap(atlas_master_image_diffuse.image)
 
 		if bao.include_normalmap == True:
 			atlas_master_image_normal = scene2.create_master_image('TextureAtlas_Normal.png')
@@ -540,6 +616,34 @@ if dlg.ask('Build texture atlas'):
 			fill_normalmap(atlas_master_image_normal.image)
 		else:
 			atlas_master_image_normal = None
+			
+		if bao.include_spec1map == True:
+			atlas_master_image_spec1 = scene2.create_master_image('TextureAtlas_Specular1.png')
+			atlas_master_image_spec1.image = xshade.create_image((bao.atlas_width, bao.atlas_height), 32)
+			fill_specularmap(atlas_master_image_spec1.image)
+		else:
+			atlas_master_image_spec1 = None
+			
+		if bao.include_bumpmap == True:
+			atlas_master_image_bump = scene2.create_master_image('TextureAtlas_Bump.png')
+			atlas_master_image_bump.image = xshade.create_image((bao.atlas_width, bao.atlas_height), 32)
+			fill_bumpmap(atlas_master_image_bump.image)
+		else:
+			atlas_master_image_bump = None
+			
+		if bao.include_glowmap == True:
+			atlas_master_image_glow = scene2.create_master_image('TextureAtlas_Glow.png')
+			atlas_master_image_glow.image = xshade.create_image((bao.atlas_width, bao.atlas_height), 32)
+			fill_glowmap(atlas_master_image_glow.image)
+		else:
+			atlas_master_image_glow = None
+			
+		if bao.include_dispmap == True:
+			atlas_master_image_disp = scene2.create_master_image('TextureAtlas_Displacement.png')
+			atlas_master_image_disp.image = xshade.create_image((bao.atlas_width, bao.atlas_height), 32)
+			fill_dispmap(atlas_master_image_disp.image)
+		else:
+			atlas_master_image_disp = None
 
 		atlas_master_surface = scene2.create_master_surface('TextureAtlas')
 
@@ -555,9 +659,37 @@ if dlg.ask('Build texture atlas'):
 			normal_layer.pattern = 14
 			normal_layer.type = 21
 			normal_layer.image = atlas_master_image_normal.image
+			
+		if bao.include_spec1map == True:
+			atlas_master_surface.surface.append_mapping_layer()
+			normal_layer = atlas_master_surface.surface.mapping_layer(1)
+			normal_layer.pattern = 14
+			normal_layer.type = 1
+			normal_layer.image = atlas_master_image_spec1.image
+			
+		if bao.include_bumpmap == True:
+			atlas_master_surface.surface.append_mapping_layer()
+			normal_layer = atlas_master_surface.surface.mapping_layer(1)
+			normal_layer.pattern = 14
+			normal_layer.type = 5
+			normal_layer.image = atlas_master_image_bump.image
+			
+		if bao.include_glowmap == True:
+			atlas_master_surface.surface.append_mapping_layer()
+			normal_layer = atlas_master_surface.surface.mapping_layer(1)
+			normal_layer.pattern = 14
+			normal_layer.type = 8
+			normal_layer.image = atlas_master_image_glow.image
+			
+		if bao.include_dispmap == True:
+			atlas_master_surface.surface.append_mapping_layer()
+			normal_layer = atlas_master_surface.surface.mapping_layer(1)
+			normal_layer.pattern = 14
+			normal_layer.type = 22
+			normal_layer.image = atlas_master_image_disp.image
 
 		for i in range(0, len(texlist)):
-			copy_texture_to_atlas(atlas_master_image_diffuse, atlas_master_image_normal, texlist[i], bao)
+			copy_texture_to_atlas(atlas_master_image_diffuse, atlas_master_image_normal, atlas_master_image_spec1, atlas_master_image_bump, atlas_master_image_glow, atlas_master_image_disp, texlist[i], bao)
 
 		# make list with unique meshes
 		meshes = []
@@ -637,6 +769,14 @@ if dlg.ask('Build texture atlas'):
 			atlas_master_image_diffuse.image.create_window('Build texture atlas: Diffuse')
 			if bao.include_normalmap == True:
 				atlas_master_image_normal.image.create_window('Build texture atlas: Normal')
+			if bao.include_spec1map == True:
+				atlas_master_image_spec1.image.create_window('Build texture atlas: Specular1')
+			if bao.include_bumpmap == True:
+				atlas_master_image_bump.image.create_window('Build texture atlas: Bump')
+			if bao.include_glowmap == True:
+				atlas_master_image_glow.image.create_window('Build texture atlas: Glow')
+			if bao.include_dispmap == True:
+				atlas_master_image_disp.image.create_window('Build texture atlas: Displacment')
 
 		#xshade.show_message_box('Success\nAtlas filled %f %%' % (packer.occupancy() * 100), False)
 		print 'Success\nAtlas filled %f %%' % (packer.occupancy() * 100)
